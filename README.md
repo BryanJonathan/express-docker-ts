@@ -1,8 +1,4 @@
----
-
-📄 **README.md**
-
-```markdown
+````markdown
 # 🚀 Express API with TypeScript and Docker
 
 This project is a simple **Express.js API** built with **TypeScript** and designed to run in both **development** (with hot reload) and **production** environments using **Docker**.
@@ -19,30 +15,6 @@ This project is a simple **Express.js API** built with **TypeScript** and design
 
 ---
 
-## 📂 Project Structure
-
-```
-
-my-express-api/
-├── src/
-│   ├── routes/
-│   │   └── health.ts
-│   ├── app.ts
-│   └── index.ts
-├── .dockerignore
-├── .gitignore
-├── Dockerfile.dev
-├── Dockerfile.prod
-├── docker-compose.yml
-├── docker-compose.override.yml
-├── package.json
-├── tsconfig.json
-└── README.md
-
-```
-
----
-
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
@@ -51,6 +23,7 @@ my-express-api/
 git clone https://github.com/your-username/my-express-api.git
 cd my-express-api
 ```
+````
 
 ---
 
