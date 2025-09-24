@@ -19,7 +19,7 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /usr/src/app
 
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 
 # copia package files e instala apenas dependencies de produção
 COPY package*.json ./
