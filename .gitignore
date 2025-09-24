@@ -1,0 +1,29 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build
+dist/
+build/
+
+# Typescript
+*.tsbuildinfo
+
+# Env files
+.env
+.env.*.local
+
+# Docker
+# Se você gerar volumes ou pastas locais para desenvolvimento
+docker-data/
+
+# Editor / SO
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

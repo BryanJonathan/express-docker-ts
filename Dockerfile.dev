@@ -1,0 +1,15 @@
+FROM node:20-alpine
+WORKDIR /usr/src/app
+
+# copia package* para instalar deps dentro do container
+COPY package*.json ./
+
+# instala todas as deps (inclui ts-node-dev)
+RUN npm ci
+
+# copia restante (o bind mount do docker-compose pode sobrescrever, mas copiar ajuda primeiras execuções)
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
