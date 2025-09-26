@@ -64,9 +64,9 @@ export class UserRepository {
     };
   }
 
-  async findByEmail(email: string): Promise<PublicUser | null> {
+  async findByEmail(email: string): Promise<User | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      "SELECT id, name, email, createdAt, updatedAt FROM users WHERE email = ?",
+      "SELECT id, name, email, passwordHash, createdAt, updatedAt FROM users WHERE email = ?",
       [email]
     );
 
@@ -79,6 +79,7 @@ export class UserRepository {
       id: row.id,
       name: row.name,
       email: row.email,
+      passwordHash: row.passwordHash,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     };

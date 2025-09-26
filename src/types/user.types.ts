@@ -11,13 +11,6 @@ export interface User {
 
 export type PublicUser = Omit<User, "passwordHash">;
 
-export interface ApiResponse<T = any> {
-  success: boolean;
-  message: string;
-  data?: T;
-  error?: string;
-}
-
 export const createUserSchema = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name too long"),
   email: z.string().email("Email is required").max(255, "Email too long"),

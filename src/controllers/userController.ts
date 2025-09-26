@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/userService";
-import {
-  createUserSchema,
-  updateUserSchema,
-  ApiResponse,
-} from "../types/user.types";
+import { createUserSchema, updateUserSchema } from "../types/user.types";
+import { ApiResponse } from "../types/apiResponse.types";
 import { ZodError } from "zod";
 
 export class UserController {
