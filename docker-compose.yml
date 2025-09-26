@@ -1,13 +1,67 @@
 services:
+  # Serviço da API Express.js
   api:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    volumes:
-      - ./:/usr/src/app:cached
-      - /usr/src/app/node_modules
+    container_name: express_api
     ports:
       - "3000:3000"
     env_file:
       - .env
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    volumes:
+      - ./:/usr/src/app:cached
+      - /usr/src/app/node_modules
+    networks:
+      - app_network
+    restart: unless-stopped
     command: npm run dev
+
+  # Serviço do MySQL
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_database
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=myapp_db
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=apppass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # phpMyAdmin para administração web (alternativa ao Workbench)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin_admin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=mysql_db
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=root123
+    depends_on:
+      - mysql_db
+    networks:
+      - app_network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  app_network:
+    driver: bridge
