@@ -1,10 +1,12 @@
 import express from "express";
-import userRouter from "./routes/private/users";
+import publicRouter from "./routes/public";
+import privateRouter from "./routes/private";
 
 const app = express();
 
 app.use(express.json());
 
-app.use(userRouter);
+app.use("/api", publicRouter);
+app.use("/api", privateRouter);
 
 export default app;
