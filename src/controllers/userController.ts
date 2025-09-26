@@ -15,12 +15,12 @@ export class UserController {
     try {
       const validatedData = createUserSchema.parse(req.body);
 
-      const user = await this.userService.createUser(validatedData);
+      const { user, token } = await this.userService.createUser(validatedData);
 
       const response: ApiResponse = {
         success: true,
         message: "User created successfully",
-        data: user,
+        data: { user, token },
       };
 
       res.status(201).json(response);

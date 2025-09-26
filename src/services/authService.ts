@@ -2,7 +2,7 @@ import { AuthRepository } from "../repositories/authRepository";
 import { UserRepository } from "../repositories/userRepository";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { PublicUser } from "../types/user.types";
+import { PublicUser, User } from "../types/user.types";
 
 export class AuthService {
   private authRepository: AuthRepository;
@@ -31,6 +31,12 @@ export class AuthService {
 
     const { passwordHash, ...userWithoutPasswordHash } = user;
 
+    const token = this.createToken(user);
+
+    return { user: userWithoutPasswordHash, token };
+  }
+
+  createToken(user: User) {
     if (!process.env.JWT_SECRET && !process.env.JWT_TIME_EXPIRES_IN) {
       throw new Error(
         "Missing JWT_SECRET or JWT_EXPIRES_IN in environment variables"
@@ -45,6 +51,6 @@ export class AuthService {
       } as SignOptions
     );
 
-    return { user: userWithoutPasswordHash, token };
+    return token;
   }
 }

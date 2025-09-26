@@ -8,24 +8,34 @@ import {
 
 import bcrypt from "bcrypt";
 import { saltRounds } from "../consts";
+import { AuthService } from "./authService";
 
 export class UserService {
   private userRepository: UserRepository;
+  private authService: AuthService;
 
   constructor() {
     this.userRepository = new UserRepository();
+    this.authService = new AuthService();
   }
 
-  async createUser(userData: CreateUserInput): Promise<PublicUser> {
+  async createUser(
+    userData: CreateUserInput
+  ): Promise<{ user: PublicUser; token: string }> {
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
       throw new Error("Email already in use");
     }
 
-    const passwordHash = await bcrypt.hash(userData.password, saltRounds);
-    userData.password = passwordHash;
+    const userPasswordHash = await bcrypt.hash(userData.password, saltRounds);
+    userData.password = userPasswordHash;
 
-    return await this.userRepository.create(userData);
+    const createdUser = await this.userRepository.create(userData);
+    const token = this.authService.createToken(createdUser);
+
+    const { passwordHash, ...userWithoutPasswordHash } = createdUser;
+
+    return { user: userWithoutPasswordHash, token };
   }
 
   async getAllUsers(): Promise<PublicUser[]> {

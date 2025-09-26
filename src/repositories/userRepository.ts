@@ -9,7 +9,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 export class UserRepository {
-  async create(userData: CreateUserInput): Promise<PublicUser> {
+  async create(userData: CreateUserInput): Promise<User> {
     const id = uuidv4();
     const { name, email, password } = userData;
 
@@ -44,9 +44,9 @@ export class UserRepository {
     }));
   }
 
-  async findById(id: string): Promise<PublicUser | null> {
+  async findById(id: string): Promise<User | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      "SELECT id, name, email, createdAt, updatedAt FROM users WHERE id = ?",
+      "SELECT id, name, email, passwordHash, createdAt, updatedAt FROM users WHERE id = ?",
       [id]
     );
 
@@ -59,6 +59,7 @@ export class UserRepository {
       id: row.id,
       name: row.name,
       email: row.email,
+      passwordHash: row.passwordHash,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     };
