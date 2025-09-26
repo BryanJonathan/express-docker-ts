@@ -1,15 +1,21 @@
-FROM node:20-alpine
+FROM node:18-alpine
+
+RUN apk add --no-cache dumb-init
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodeuser -u 1001
+
 WORKDIR /usr/src/app
 
-# copia package* para instalar deps dentro do container
-COPY package*.json ./
+RUN chown -R nodeuser:nodejs /usr/src/app
+USER nodeuser
 
-# instala todas as deps (inclui ts-node-dev)
-RUN npm ci
+COPY --chown=nodeuser:nodejs package*.json ./
 
-# copia restante (o bind mount do docker-compose pode sobrescrever, mas copiar ajuda primeiras execuções)
-COPY . .
+RUN npm ci && npm cache clean --force
 
 EXPOSE 3000
+
+ENTRYPOINT ["dumb-init", "--"]
 
 CMD ["npm", "run", "dev"]
