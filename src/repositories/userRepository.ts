@@ -1,16 +1,21 @@
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 import { pool } from "../config/database";
-import { User, CreateUserInput, UpdateUserInput } from "../types/user.types";
+import {
+  User,
+  CreateUserInput,
+  UpdateUserInput,
+  PublicUser,
+} from "../types/user.types";
 import { v4 as uuidv4 } from "uuid";
 
 export class UserRepository {
-  async create(userData: CreateUserInput): Promise<User> {
+  async create(userData: CreateUserInput): Promise<PublicUser> {
     const id = uuidv4();
-    const { name, email } = userData;
+    const { name, email, password } = userData;
 
     const [result] = await pool.execute<ResultSetHeader>(
-      "INSERT INTO users (id, name, email) VALUES (?, ?, ?)",
-      [id, name, email]
+      "INSERT INTO users (id, name, email, passwordHash) VALUES (?, ?, ?, ?)",
+      [id, name, email, password]
     );
 
     if (result.affectedRows === 0) {
@@ -25,7 +30,7 @@ export class UserRepository {
     return createdUser;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<PublicUser[]> {
     const [rows] = await pool.execute<RowDataPacket[]>(
       "SELECT id, name, email, createdAt, updatedAt FROM users ORDER BY createdAt DESC"
     );
@@ -39,7 +44,7 @@ export class UserRepository {
     }));
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<PublicUser | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
       "SELECT id, name, email, createdAt, updatedAt FROM users WHERE id = ?",
       [id]
@@ -59,7 +64,7 @@ export class UserRepository {
     };
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<PublicUser | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
       "SELECT id, name, email, createdAt, updatedAt FROM users WHERE email = ?",
       [email]
@@ -79,7 +84,10 @@ export class UserRepository {
     };
   }
 
-  async update(id: string, userData: UpdateUserInput): Promise<User | null> {
+  async update(
+    id: string,
+    userData: UpdateUserInput
+  ): Promise<PublicUser | null> {
     const updates: string[] = [];
     const values: any[] = [];
 
