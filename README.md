@@ -1,4 +1,3 @@
-```markdown
 # 🚀 Express API with TypeScript, MySQL and Docker
 
 A simple **Express.js API** built with **TypeScript**, designed to run in both **development** (with hot reload) and **production** environments using **Docker**.
@@ -16,8 +15,8 @@ A simple **Express.js API** built with **TypeScript**, designed to run in both *
 
 ---
 
-## 🏗 Project Structure
 ```
+## 🏗 Project Structure
 
 src/
 ├── app.ts # Main application setup
@@ -29,7 +28,7 @@ src/
 ├── services/ # Business logic
 ├── types/ # TypeScript type definitions
 
-````
+```
 
 ---
 
@@ -40,7 +39,7 @@ src/
 ```bash
 git clone https://github.com/BryanJonathan/express-docker-ts.git
 cd my-express-api
-````
+```
 
 ### 2. Install dependencies
 
