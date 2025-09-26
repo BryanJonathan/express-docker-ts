@@ -1,31 +1,21 @@
-# Dockerfile para desenvolvimento com hot reload
 FROM node:18-alpine
 
-# Instalar dumb-init para melhor handling de sinais
 RUN apk add --no-cache dumb-init
 
-# Criar usuário não-root para segurança
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodeuser -u 1001
 
-# Define o diretório de trabalho
 WORKDIR /usr/src/app
 
-# Alterar proprietário do diretório
 RUN chown -R nodeuser:nodejs /usr/src/app
 USER nodeuser
 
-# Copia os arquivos de dependências
 COPY --chown=nodeuser:nodejs package*.json ./
 
-# Instala as dependências (incluindo devDependencies para desenvolvimento)
 RUN npm ci && npm cache clean --force
 
-# Expõe a porta da aplicação
 EXPOSE 3000
 
-# Usar dumb-init para melhor handling de sinais no desenvolvimento
 ENTRYPOINT ["dumb-init", "--"]
 
-# Comando padrão (pode ser sobrescrito no docker-compose)
 CMD ["npm", "run", "dev"]

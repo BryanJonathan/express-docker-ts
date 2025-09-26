@@ -1,5 +1,4 @@
 services:
-  # Serviço da API Express.js
   api:
     build:
       context: .
@@ -20,7 +19,6 @@ services:
     restart: unless-stopped
     command: npm run dev
 
-  # Serviço do MySQL
   mysql_db:
     image: mysql:8.0
     container_name: mysql_database
@@ -42,7 +40,6 @@ services:
       timeout: 20s
       retries: 10
 
-  # phpMyAdmin para administração web (alternativa ao Workbench)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmin_admin
