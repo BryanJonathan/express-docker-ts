@@ -88,7 +88,6 @@ export class UserController {
         return;
       }
 
-      // Validar dados de entrada
       const validatedData = updateUserSchema.parse(req.body);
 
       const user = await this.userService.updateUser(id, validatedData);

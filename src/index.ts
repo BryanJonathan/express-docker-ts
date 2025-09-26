@@ -12,7 +12,6 @@ const server = app.listen(PORT, "0.0.0.0", () => {
     `🚀 Server listening on port ${PORT} (NODE_ENV=${process.env.NODE_ENV})`
   );
 
-  // Testar conexão com banco
   testDatabaseConnection();
 });
 
