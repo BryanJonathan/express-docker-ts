@@ -122,6 +122,19 @@ export class UserRepository {
     return await this.findById(id);
   }
 
+  async updatePassword(userId: string, hashedPassword: string) {
+    const [result] = await pool.execute<ResultSetHeader>(
+      "UPDATE users SET passwordHash = ? WHERE id = ?",
+      [hashedPassword, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      throw new Error("Error updating password");
+    }
+
+    return result.affectedRows === 1;
+  }
+
   async delete(id: string): Promise<boolean> {
     const [result] = await pool.execute<ResultSetHeader>(
       "DELETE FROM users WHERE id = ?",
