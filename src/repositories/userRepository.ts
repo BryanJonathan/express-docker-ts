@@ -6,6 +6,7 @@ import {
   UpdateUserInput,
   PublicUser,
 } from "../types/user.types";
+import { UserTable, UserTableColumns } from "../types/dbTables/users";
 import { v4 as uuidv4 } from "uuid";
 
 export class UserRepository {
@@ -14,7 +15,7 @@ export class UserRepository {
     const { name, email, password } = userData;
 
     const [result] = await pool.execute<ResultSetHeader>(
-      "INSERT INTO users (id, name, email, passwordHash) VALUES (?, ?, ?, ?)",
+      `INSERT INTO ${UserTable.TABLE_NAME} (${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.PASSWORD_HASH}) VALUES (?, ?, ?, ?)`,
       [id, name, email, password]
     );
 
@@ -32,7 +33,7 @@ export class UserRepository {
 
   async findAll(): Promise<PublicUser[]> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      "SELECT id, name, email, createdAt, updatedAt FROM users ORDER BY createdAt DESC"
+      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT} FROM ${UserTable.TABLE_NAME} ORDER BY createdAt DESC`
     );
 
     return rows.map((row) => ({
@@ -46,7 +47,7 @@ export class UserRepository {
 
   async findById(id: string): Promise<User | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      "SELECT id, name, email, passwordHash, createdAt, updatedAt FROM users WHERE id = ?",
+      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.PASSWORD_HASH}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT} FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.ID} = ?`,
       [id]
     );
 
@@ -67,7 +68,7 @@ export class UserRepository {
 
   async findByEmail(email: string): Promise<User | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      "SELECT id, name, email, passwordHash, createdAt, updatedAt FROM users WHERE email = ?",
+      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.PASSWORD_HASH}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT} FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.EMAIL} = ?`,
       [email]
     );
 
@@ -94,24 +95,26 @@ export class UserRepository {
     const values: any[] = [];
 
     if (userData.name !== undefined) {
-      updates.push("name = ?");
+      updates.push(`${UserTableColumns.NAME} = ?`);
       values.push(userData.name);
     }
 
     if (userData.email !== undefined) {
-      updates.push("email = ?");
+      updates.push(`${UserTableColumns.EMAIL} = ?`);
       values.push(userData.email);
     }
 
     if (updates.length === 0) {
-      throw new Error("No field to update");
+      throw new Error(`No field to update`);
     }
 
-    updates.push("updatedAt = CURRENT_TIMESTAMP");
+    updates.push(`${UserTableColumns.UPDATED_AT} = CURRENT_TIMESTAMP`);
     values.push(id);
 
     const [result] = await pool.execute<ResultSetHeader>(
-      `UPDATE users SET ${updates.join(", ")} WHERE id = ?`,
+      `UPDATE ${UserTable.TABLE_NAME} SET ${updates.join(", ")} WHERE ${
+        UserTableColumns.ID
+      } = ?`,
       values
     );
 
@@ -124,7 +127,7 @@ export class UserRepository {
 
   async updatePassword(userId: string, hashedPassword: string) {
     const [result] = await pool.execute<ResultSetHeader>(
-      "UPDATE users SET passwordHash = ? WHERE id = ?",
+      `UPDATE ${UserTable.TABLE_NAME} SET ${UserTableColumns.PASSWORD_HASH} = ? WHERE ${UserTableColumns.ID} = ?`,
       [hashedPassword, userId]
     );
 
@@ -137,7 +140,7 @@ export class UserRepository {
 
   async delete(id: string): Promise<boolean> {
     const [result] = await pool.execute<ResultSetHeader>(
-      "DELETE FROM users WHERE id = ?",
+      `DELETE FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.ID} = ?`,
       [id]
     );
 
@@ -145,11 +148,11 @@ export class UserRepository {
   }
 
   async emailExists(email: string, excludeId?: string): Promise<boolean> {
-    let query = "SELECT COUNT(*) as count FROM users WHERE email = ?";
+    let query = `SELECT COUNT(*) as count FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.EMAIL} = ?`;
     const params: any[] = [email];
 
     if (excludeId) {
-      query += " AND id != ?";
+      query += ` AND ${UserTableColumns.ID} != ?`;
       params.push(excludeId);
     }
 
