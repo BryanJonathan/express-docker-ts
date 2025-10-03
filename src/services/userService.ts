@@ -1,27 +1,48 @@
 import { UserRepository } from "../repositories/userRepository";
-import { User, CreateUserInput, UpdateUserInput } from "../types/user.types";
+import {
+  User,
+  CreateUserInput,
+  UpdateUserInput,
+  PublicUser,
+} from "../types/user.types";
+
+import bcrypt from "bcrypt";
+import { saltRounds } from "../consts";
+import { AuthService } from "./authService";
 
 export class UserService {
   private userRepository: UserRepository;
+  private authService: AuthService;
 
   constructor() {
     this.userRepository = new UserRepository();
+    this.authService = new AuthService();
   }
 
-  async createUser(userData: CreateUserInput): Promise<User> {
+  async createUser(
+    userData: CreateUserInput
+  ): Promise<{ user: PublicUser; token: string }> {
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
       throw new Error("Email already in use");
     }
 
-    return await this.userRepository.create(userData);
+    const userPasswordHash = await bcrypt.hash(userData.password, saltRounds);
+    userData.password = userPasswordHash;
+
+    const createdUser = await this.userRepository.create(userData);
+    const token = this.authService.createToken(createdUser);
+
+    const { passwordHash, ...userWithoutPasswordHash } = createdUser;
+
+    return { user: userWithoutPasswordHash, token };
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<PublicUser[]> {
     return await this.userRepository.findAll();
   }
 
-  async getUserById(id: string): Promise<User> {
+  async getUserById(id: string): Promise<PublicUser> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new Error("User not found");
@@ -29,7 +50,7 @@ export class UserService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<PublicUser> {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new Error("User not found");
@@ -37,7 +58,7 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: string, userData: UpdateUserInput): Promise<User> {
+  async updateUser(id: string, userData: UpdateUserInput): Promise<PublicUser> {
     const existingUser = await this.userRepository.findById(id);
     if (!existingUser) {
       throw new Error("User not found");
