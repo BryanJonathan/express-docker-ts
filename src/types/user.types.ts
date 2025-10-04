@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export interface JWTPayload {
+  id: string;
+  role: UserRole;
+  email: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -7,7 +13,10 @@ export interface User {
   passwordHash: string;
   createdAt: Date;
   updatedAt: Date;
+  role: UserRole;
 }
+
+export type UserRole = "user" | "admin";
 
 export type PublicUser = Omit<User, "passwordHash">;
 

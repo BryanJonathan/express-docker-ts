@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { UserRole } from "../types/user.types";
 
 export const authMiddleware = (
   req: Request,
@@ -20,4 +21,18 @@ export const authMiddleware = (
   } catch (err) {
     return res.status(403).json({ message: "Invalid or expired token" });
   }
+};
+
+export const authorizeMiddleware = (roles: UserRole[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    next();
+  };
 };

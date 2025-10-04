@@ -9,4 +9,5 @@ export const UserTableColumns = {
   CREATED_AT: "createdAt",
   UPDATED_AT: "updatedAt",
   PASSWORD_HASH: "passwordHash",
+  ROLE: "role",
 } as const;

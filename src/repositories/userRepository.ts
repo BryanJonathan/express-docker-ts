@@ -33,7 +33,7 @@ export class UserRepository {
 
   async findAll(): Promise<PublicUser[]> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT} FROM ${UserTable.TABLE_NAME} ORDER BY createdAt DESC`
+      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT}, ${UserTableColumns.ROLE} FROM ${UserTable.TABLE_NAME} ORDER BY createdAt DESC`
     );
 
     return rows.map((row) => ({
@@ -42,12 +42,13 @@ export class UserRepository {
       email: row.email,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
+      role: row.role,
     }));
   }
 
   async findById(id: string): Promise<User | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.PASSWORD_HASH}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT} FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.ID} = ?`,
+      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.PASSWORD_HASH}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT}, ${UserTableColumns.ROLE} FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.ID} = ?`,
       [id]
     );
 
@@ -63,12 +64,13 @@ export class UserRepository {
       passwordHash: row.passwordHash,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
+      role: row.role,
     };
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT ${UserTableColumns.ID}, ${UserTableColumns.NAME}, ${UserTableColumns.EMAIL}, ${UserTableColumns.PASSWORD_HASH}, ${UserTableColumns.CREATED_AT}, ${UserTableColumns.UPDATED_AT} FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.EMAIL} = ?`,
+      `SELECT * FROM ${UserTable.TABLE_NAME} WHERE ${UserTableColumns.EMAIL} = ?`,
       [email]
     );
 
@@ -84,6 +86,7 @@ export class UserRepository {
       passwordHash: row.passwordHash,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
+      role: row.role,
     };
   }
 
